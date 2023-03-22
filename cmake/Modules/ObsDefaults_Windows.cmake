@@ -88,22 +88,6 @@ macro(setup_obs_project)
     set(QTDIR "$ENV{QTDIR}")
   endif()
 
-  if(DEFINED DepsPath${_ARCH_SUFFIX})
-    list(APPEND CMAKE_PREFIX_PATH "${DepsPath${_ARCH_SUFFIX}}"
-         "${DepsPath${_ARCH_SUFFIX}}/bin")
-  elseif(DEFINED DepsPath)
-    list(APPEND CMAKE_PREFIX_PATH "${DepsPath}" "${DepsPath}/bin")
-  elseif(NOT DEFINED CMAKE_PREFIX_PATH)
-    message(
-      WARNING
-        "No CMAKE_PREFIX_PATH set: OBS requires pre-built dependencies for building on Windows."
-        "Please download the appropriate obs-deps package for your architecture and set CMAKE_PREFIX_PATH "
-        "to the base directory and 'bin' directory inside it:\n"
-        "CMAKE_PREFIX_PATH=\"<PATH_TO_OBS_DEPS>\"\n"
-        "Download pre-built OBS dependencies at https://github.com/obsproject/obs-deps/releases\n"
-    )
-  endif()
-
   if(DEFINED QTDIR${_ARCH_SUFFIX})
     list(APPEND CMAKE_PREFIX_PATH "${QTDIR${_ARCH_SUFFIX}}")
   elseif(DEFINED QTDIR)

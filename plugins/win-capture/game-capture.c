@@ -9,7 +9,6 @@
 #include <dxgi.h>
 #include <util/sse-intrin.h>
 #include <util/util_uint64.h>
-#include <ipc-util/pipe.h>
 #include <util/windows/obfuscate.h>
 #include "inject-library.h"
 #include "compat-helpers.h"

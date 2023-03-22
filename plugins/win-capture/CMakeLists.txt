@@ -43,13 +43,9 @@ target_sources(
           ../../libobs/util/windows/obfuscate.h
           ${CMAKE_BINARY_DIR}/config/compat-config.h)
 
-target_link_libraries(win-capture PRIVATE OBS::libobs OBS::ipc-util
-                                          OBS::file-updater Jansson::Jansson)
-
 set_target_properties(win-capture PROPERTIES FOLDER "plugins/win-capture")
 
 if(MSVC)
-  target_link_libraries(win-capture PRIVATE OBS::w32-pthreads)
   target_link_options(win-capture PRIVATE "LINKER:/IGNORE:4098")
 endif()
 
