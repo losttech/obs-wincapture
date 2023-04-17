@@ -4,7 +4,6 @@ find_package(Detours REQUIRED)
 find_package(Vulkan REQUIRED)
 
 add_library(graphics-hook MODULE)
-add_library(OBS::graphics-hook ALIAS graphics-hook)
 
 target_sources(
   graphics-hook
@@ -19,6 +18,8 @@ target_sources(
           d3d10-capture.cpp
           d3d11-capture.cpp
           d3d12-capture.cpp
+          ../../../deps/ipc-util/ipc-util/pipe.h
+          ../../../deps/ipc-util/ipc-util/pipe-windows.c
           ../../../libobs/util/windows/obfuscate.c
           ../../../libobs/util/windows/obfuscate.h
           ../graphics-hook-ver.h
@@ -28,7 +29,7 @@ target_sources(
 
 target_include_directories(graphics-hook PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/..)
 
-target_link_libraries(graphics-hook PRIVATE OBS::ipc-util Detours::Detours
+target_link_libraries(graphics-hook PRIVATE Detours::Detours
                                             dxguid)
 target_link_options(graphics-hook PRIVATE "LINKER:/IGNORE:4099")
 
@@ -43,6 +44,19 @@ set_target_properties(
              "graphics-hook$<IF:$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>,64,32>")
 
 target_compile_definitions(graphics-hook PRIVATE COMPILE_D3D12_HOOK)
+
+function(add_target_resource target resource destination)
+  install(
+    FILES ${resource}
+    DESTINATION ${OBS_DATA_DESTINATION}/${destination}
+    COMPONENT ${target}_Runtime)
+
+  install(
+    FILES ${resource}
+    DESTINATION ${OBS_DATA_DESTINATION}/${destination}
+    COMPONENT obs_${target}
+    EXCLUDE_FROM_ALL)
+endfunction()
 
 if(TARGET Vulkan::Vulkan)
   target_sources(graphics-hook PRIVATE vulkan-capture.c vulkan-capture.h)
@@ -60,6 +74,3 @@ if(TARGET Vulkan::Vulkan)
 endif()
 
 set(OBS_PLUGIN_DESTINATION "${OBS_DATA_DESTINATION}/obs-plugins/win-capture/")
-setup_plugin_target(graphics-hook)
-
-add_dependencies(win-capture graphics-hook)

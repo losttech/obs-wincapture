@@ -6,7 +6,7 @@
 #endif
 
 #include "../graphics-hook-info.h"
-#include <ipc-util/pipe.h>
+#include "../../deps/ipc-util/ipc-util/pipe.h"
 #include <psapi.h>
 
 #ifdef __cplusplus
