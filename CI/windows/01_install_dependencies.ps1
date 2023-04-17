@@ -41,73 +41,6 @@ Function Install-obs-deps {
     }
 }
 
-function Install-qt-deps {
-    Param(
-        [Parameter(Mandatory=$true)]
-        [String]$Version
-    )
-
-    Write-Status "Setup for pre-built dependency Qt v${Version}"
-    Ensure-Directory $DepsBuildDir
-
-    $ArchSuffix = $BuildArch
-
-    if (!(Test-Path "${DepsBuildDir}/windows-deps-${Version}-${ArchSuffix}/mkspecs")) {
-
-        Write-Step "Download..."
-        curl.exe -Lf "https://github.com/obsproject/obs-deps/releases/download/${Version}/windows-deps-qt6-${Version}-${ArchSuffix}.zip" -o "windows-deps-qt6-${Version}-${ArchSuffix}.zip" $(if ($Quiet.isPresent) { "-s" })
-
-        Write-Step "Unpack..."
-
-        Expand-Archive -Path "windows-deps-qt6-${Version}-${ArchSuffix}.zip" -DestinationPath "${DepsBuildDir}/windows-deps-${Version}-${ArchSuffix}" -Force
-    } else {
-        Write-Step "Found existing pre-built Qt..."
-    }
-}
-
-function Install-vlc {
-    Param(
-        [Parameter(Mandatory=$true)]
-        [String]$Version
-    )
-
-    Write-Status "Setup for dependency VLC v${Version}"
-    Ensure-Directory $DepsBuildDir
-
-    if (!((Test-Path "$DepsBuildDir/vlc-${Version}") -and (Test-Path "$DepsBuildDir/vlc-${Version}/include/vlc/vlc.h"))) {
-        Write-Step "Download..."
-        curl.exe -Lf "https://cdn-fastly.obsproject.com/downloads/vlc.zip" -o "vlc_${Version}.zip" $(if ($Quiet.isPresent) { "-s" })
-
-        Write-Step "Unpack..."
-        # Expand-Archive -Path "vlc_${Version}.zip"
-        Invoke-Expression "7z x vlc_${Version}.zip -ovlc"
-        Move-Item -Path vlc -Destination "vlc-${Version}"
-    } else {
-        Write-Step "Found existing VLC..."
-    }
-}
-
-function Install-cef {
-    Param(
-        [Parameter(Mandatory=$true)]
-        [String]$Version
-    )
-    Write-Status "Setup for dependency CEF v${Version} - ${BuildArch}"
-
-    Ensure-Directory $DepsBuildDir
-    $ArchSuffix = $BuildArch
-
-    if (!((Test-Path "${DepsBuildDir}/cef_binary_${Version}_windows_${ArchSuffix}") -and (Test-Path "${DepsBuildDir}/cef_binary_${Version}_windows_${ArchSuffix}/build/libcef_dll_wrapper/Release/libcef_dll_wrapper.lib"))) {
-        Write-Step "Download..."
-        curl.exe -Lf "https://cdn-fastly.obsproject.com/downloads/cef_binary_${Version}_windows_${ArchSuffix}.zip" -o "cef_binary_${Version}_windows_${ArchSuffix}.zip" $(if ($Quiet.isPresent) { "-s" })
-
-        Write-Step "Unpack..."
-        Expand-Archive -Path "cef_binary_${Version}_windows_${ArchSuffix}.zip" -Force
-    } else {
-        Write-Step "Found existing CEF framework and loader library..."
-    }
-}
-
 function Install-Dependencies {
     Param(
         [String]$BuildArch = $(if (Test-Path variable:BuildArch) { "${BuildArch}" })
@@ -116,10 +49,7 @@ function Install-Dependencies {
     Install-Windows-Dependencies
 
     $BuildDependencies = @(
-        @('obs-deps', $WindowsDepsVersion),
-        @('qt-deps', $WindowsDepsVersion),
-        @('vlc', $WindowsVlcVersion),
-        @('cef', $WindowsCefVersion)
+        @('obs-deps', $WindowsDepsVersion)
     )
 
     Foreach($Dependency in ${BuildDependencies}) {

@@ -87,24 +87,6 @@ jobs:
       - name: 'Add msbuild to PATH'
         uses: microsoft/setup-msbuild@v1.1
 
-      - name: 'Restore VLC dependency from cache'
-        id: vlc-cache
-        uses: actions/cache@v3
-        env:
-          CACHE_NAME: 'vlc-cache'
-        with:
-          path: ${{ github.workspace }}/obs-build-dependencies/vlc-${{ env.VLC_VERSION_WIN }}
-          key: ${{ runner.os }}-pr-${{ env.CACHE_NAME }}-${{ env.VLC_VERSION_WIN }}-${{ env.CACHE_REVISION }}
-
-      - name: 'Restore Chromium Embedded Framework from cache'
-        id: cef-cache
-        uses: actions/cache@v3
-        env:
-          CACHE_NAME: 'cef-cache'
-        with:
-          path: ${{ github.workspace }}/obs-build-dependencies/cef_binary_${{ env.CEF_BUILD_VERSION_WIN }}_windows_${{ matrix.arch }}
-          key: ${{ runner.os }}-pr-${{ env.CACHE_NAME }}-${{ env.CEF_BUILD_VERSION_WIN }}-${{ matrix.arch }}-${{ env.CACHE_REVISION }}
-
       - name: Setup Environment
         id: setup
         run: |
@@ -119,17 +101,3 @@ jobs:
 
       - name: 'Build OBS'
         run: CI/windows/02_build_obs.ps1 -BuildArch ${{ matrix.arch }}
-
-      - name: 'Create build artifact'
-        if: ${{ success() && fromJSON(needs.config.outputs.create_artifacts) }}
-        run: |
-          CI/windows/03_package_obs.ps1 -BuildArch ${{ matrix.arch }} -Package
-          $ArtifactName = Get-ChildItem -filter "obs-studio-*-windows-${{ matrix.arch }}.zip" -File
-          Write-Output "FILE_NAME=${ArtifactName}" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
-
-      - name: 'Upload build artifact'
-        if: ${{ success() && fromJSON(needs.config.outputs.create_artifacts) }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: 'obs-studio-windows-${{ matrix.arch }}-${{ steps.setup.outputs.commitHash }}'
-          path: '${{ env.FILE_NAME }}'
