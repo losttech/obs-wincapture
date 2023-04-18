@@ -1,3 +1,8 @@
+/plugins/win-capture/get-graphics-offsets/build/
+/plugins/win-capture/graphics-hook/build/
+windows-deps*.zip
+/windows-deps*/
+
 #binaries
 *.exe
 *.dll
