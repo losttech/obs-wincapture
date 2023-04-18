@@ -48,17 +48,7 @@ function Install-Dependencies {
 
     Install-Windows-Dependencies
 
-    $BuildDependencies = @(
-        @('obs-deps', $WindowsDepsVersion)
-    )
-
-    Foreach($Dependency in ${BuildDependencies}) {
-        $DependencyName = $Dependency[0]
-        $DependencyVersion = $Dependency[1]
-
-        $FunctionName = "Install-${DependencyName}"
-        Invoke-Expression "${FunctionName} -Version ${DependencyVersion}"
-    }
+    Install-obs-deps -Version $WindowsDepsVersion
 
     Ensure-Directory ${CheckoutDir}
 }
