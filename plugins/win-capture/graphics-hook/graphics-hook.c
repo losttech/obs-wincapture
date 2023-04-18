@@ -201,13 +201,14 @@ static DWORD WINAPI dummy_window_thread(LPVOID *unused)
 	wc.lpfnWndProc = (WNDPROC)DefWindowProc;
 	wc.lpszClassName = dummy_window_class;
 
-	if (!RegisterClass(&wc)) {
+	ATOM classAtom = RegisterClass(&wc);
+	if (!classAtom) {
 		hlog("Failed to create temp D3D window class: %lu",
 		     GetLastError());
 		return 0;
 	}
 
-	dummy_window = CreateWindowExW(0, dummy_window_class, L"Temp Window",
+	dummy_window = CreateWindowExW(0, (LPCWSTR)classAtom, L"Temp Window",
 				       DEF_FLAGS, 0, 0, 1, 1, NULL, NULL,
 				       dll_inst, NULL);
 	if (!dummy_window) {
@@ -593,6 +594,7 @@ bool capture_init_shtex(struct shtex_data **data, HWND window, uint32_t cx,
 	return true;
 }
 
+/** Copies frames to shared memory until stop_event is signaled */
 static DWORD CALLBACK copy_thread(LPVOID unused)
 {
 	uint32_t pitch = thread_data.pitch;

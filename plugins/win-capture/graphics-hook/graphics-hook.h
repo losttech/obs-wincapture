@@ -164,6 +164,11 @@ static inline bool capture_active(void)
 	return active;
 }
 
+/** Called to throttle frames to the desired framerate
+*
+* @param interval The desired interval between frames (nanoseconds).
+* 0 - as fast as possible.
+*/
 static inline bool frame_ready(uint64_t interval)
 {
 	static uint64_t last_time = 0;
