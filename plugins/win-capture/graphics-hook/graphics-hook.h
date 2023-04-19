@@ -103,7 +103,6 @@ extern ipc_pipe_client_t pipe;
 extern HANDLE signal_restart;
 extern HANDLE signal_stop;
 extern HANDLE signal_ready;
-extern HANDLE signal_exit;
 extern HANDLE tex_mutexes[2];
 extern char system_path[MAX_PATH];
 extern char process_name[MAX_PATH];
