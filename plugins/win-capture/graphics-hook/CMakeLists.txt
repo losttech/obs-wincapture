@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 3.16...3.25)
-
 project(graphics-hook)
 
 find_package(Detours REQUIRED)
@@ -29,23 +27,15 @@ target_sources(
           ../hook-helpers.h
           graphics-hook.rc)
 
-target_include_directories(graphics-hook PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/..)
+target_include_directories(graphics-hook
+                           PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/..)
 
-target_link_libraries(graphics-hook PRIVATE Detours::Detours
-                                            dxguid)
+target_link_libraries(graphics-hook PRIVATE Detours::Detours dxguid)
 target_link_options(graphics-hook PRIVATE "LINKER:/IGNORE:4099")
 
 add_definitions(-DUNICODE -D_UNICODE -D_CRT_SECURE_NO_WARNINGS)
 
 if(MSVC)
-  set(CMAKE_C_FLAGS_DEBUG "/DDEBUG=1 /D_DEBUG=1 ${CMAKE_C_FLAGS_DEBUG}")
-  set(CMAKE_CXX_FLAGS_DEBUG "/DDEBUG=1 /D_DEBUG=1 ${CMAKE_C_FLAGS_DEBUG}")
-  if(NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO")
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /SAFESEH:NO")
-    set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} /SAFESEH:NO")
-  endif()
-
   target_compile_options(graphics-hook PRIVATE "$<IF:$<CONFIG:Debug>,/MTd,/MT>")
 endif()
 
@@ -56,19 +46,6 @@ set_target_properties(
              "graphics-hook$<IF:$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>,64,32>")
 
 target_compile_definitions(graphics-hook PRIVATE COMPILE_D3D12_HOOK)
-
-function(add_target_resource target resource destination)
-  install(
-    FILES ${resource}
-    DESTINATION ${OBS_DATA_DESTINATION}/${destination}
-    COMPONENT ${target}_Runtime)
-
-  install(
-    FILES ${resource}
-    DESTINATION ${OBS_DATA_DESTINATION}/${destination}
-    COMPONENT obs_${target}
-    EXCLUDE_FROM_ALL)
-endfunction()
 
 if(TARGET Vulkan::Vulkan)
   target_sources(graphics-hook PRIVATE vulkan-capture.c vulkan-capture.h)
