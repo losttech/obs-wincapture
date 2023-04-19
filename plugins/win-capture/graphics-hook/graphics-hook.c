@@ -31,7 +31,6 @@ ipc_pipe_client_t pipe = {0};
 HANDLE signal_restart = NULL;
 HANDLE signal_stop = NULL;
 HANDLE signal_ready = NULL;
-HANDLE signal_exit = NULL;
 static HANDLE signal_init = NULL;
 HANDLE tex_mutexes[2] = {NULL, NULL};
 static HANDLE filemap_hook_info = NULL;
@@ -108,11 +107,6 @@ static inline bool init_signals(void)
 
 	signal_ready = init_event(EVENT_HOOK_READY, pid);
 	if (!signal_ready) {
-		return false;
-	}
-
-	signal_exit = init_event(EVENT_HOOK_EXIT, pid);
-	if (!signal_exit) {
 		return false;
 	}
 
@@ -273,7 +267,6 @@ static void free_hook(void)
 
 	close_handle(&tex_mutexes[1]);
 	close_handle(&tex_mutexes[0]);
-	close_handle(&signal_exit);
 	close_handle(&signal_ready);
 	close_handle(&signal_stop);
 	close_handle(&signal_restart);

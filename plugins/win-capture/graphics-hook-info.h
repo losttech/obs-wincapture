@@ -12,7 +12,6 @@
 #define EVENT_CAPTURE_STOP L"CaptureHook_Stop"
 
 #define EVENT_HOOK_READY L"CaptureHook_HookReady"
-#define EVENT_HOOK_EXIT L"CaptureHook_Exit"
 
 #define EVENT_HOOK_INIT L"CaptureHook_Initialize"
 
