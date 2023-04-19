@@ -133,7 +133,7 @@ static ULONG STDMETHODCALLTYPE hook_release(IUnknown *unknown)
 	return refs;
 }
 
-static bool resize_buffers_called = false;
+static bool next_backbuffer_invalid = false;
 
 static HRESULT STDMETHODCALLTYPE hook_resize_buffers(IDXGISwapChain *swap,
 						     UINT buffer_count,
@@ -156,7 +156,14 @@ static HRESULT STDMETHODCALLTYPE hook_resize_buffers(IDXGISwapChain *swap,
 	const HRESULT hr = RealResizeBuffers(swap, buffer_count, width, height,
 					     format, flags);
 
-	resize_buffers_called = true;
+	/*
+	* It seems that the first call to Present after ResizeBuffers
+	* will cause the backbuffer to be invalidated, so do not
+	* perform the post-overlay capture if ResizeBuffers has
+	* recently been called.  (The backbuffer returned by
+	* get_dxgi_backbuffer *will* be invalid otherwise)
+	*/
+	next_backbuffer_invalid = true;
 
 	return hr;
 }
@@ -236,15 +243,8 @@ static HRESULT STDMETHODCALLTYPE hook_present(IDXGISwapChain *swap,
 	dxgi_present_attempted = true;
 
 	if (capture && capture_overlay) {
-		/*
-		 * It seems that the first call to Present after ResizeBuffers
-		 * will cause the backbuffer to be invalidated, so do not
-		 * perform the post-overlay capture if ResizeBuffers has
-		 * recently been called.  (The backbuffer returned by
-		 * get_dxgi_backbuffer *will* be invalid otherwise)
-		 */
-		if (resize_buffers_called) {
-			resize_buffers_called = false;
+		if (next_backbuffer_invalid) {
+			next_backbuffer_invalid = false;
 		} else {
 			IUnknown *backbuffer = get_dxgi_backbuffer(swap);
 
@@ -301,8 +301,8 @@ hook_present1(IDXGISwapChain1 *swap, UINT sync_interval, UINT flags,
 	dxgi_present_attempted = true;
 
 	if (capture && capture_overlay) {
-		if (resize_buffers_called) {
-			resize_buffers_called = false;
+		if (next_backbuffer_invalid) {
+			next_backbuffer_invalid = false;
 		} else {
 			IUnknown *backbuffer = get_dxgi_backbuffer(swap);
 
