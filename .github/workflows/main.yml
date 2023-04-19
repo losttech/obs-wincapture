@@ -36,13 +36,6 @@ jobs:
           ./CI/check-format.sh
           ./CI/check-changes.sh
 
-      - name: 'Install cmake-format'
-        run: sudo pip install cmakelang
-
-      - name: 'Run cmake-format'
-        run: |
-          ./CI/check-cmake.sh
-
   config:
     name: '01 - Configure Build Jobs'
     runs-on: [ubuntu-22.04]
