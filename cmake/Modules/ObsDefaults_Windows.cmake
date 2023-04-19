@@ -48,26 +48,6 @@ macro(setup_obs_project)
   set(OBS_DATA_PATH "../../${OBS_DATA_DESTINATION}")
   set(OBS_INSTALL_PREFIX "")
 
-  set(OBS_SCRIPT_PLUGIN_DESTINATION
-      "${OBS_DATA_DESTINATION}/obs-scripting/${_ARCH_SUFFIX}bit")
-  set(OBS_SCRIPT_PLUGIN_PATH "../../${OBS_SCRIPT_PLUGIN_DESTINATION}")
-
-  string(REPLACE "-" ";" UI_VERSION_SPLIT ${OBS_VERSION})
-  list(GET UI_VERSION_SPLIT 0 UI_VERSION)
-  string(REPLACE "." ";" UI_VERSION_SEMANTIC ${UI_VERSION})
-  list(GET UI_VERSION_SEMANTIC 0 UI_VERSION_MAJOR)
-  list(GET UI_VERSION_SEMANTIC 1 UI_VERSION_MINOR)
-  list(GET UI_VERSION_SEMANTIC 2 UI_VERSION_PATCH)
-
-  if(INSTALLER_RUN
-     AND NOT DEFINED ENV{OBS_InstallerTempDir}
-     AND NOT DEFINED ENV{obsInstallerTempDir})
-    message(
-      FATAL_ERROR
-        "Environment variable obsInstallerTempDir is needed for multiarch installer generation"
-    )
-  endif()
-
   if(DEFINED ENV{OBS_DepsPath${_ARCH_SUFFIX}})
     set(DepsPath${_ARCH_SUFFIX} "$ENV{OBS_DepsPath${_ARCH_SUFFIX}}")
   elseif(DEFINED ENV{OBS_DepsPath})
@@ -76,16 +56,6 @@ macro(setup_obs_project)
     set(DepsPath${_ARCH_SUFFIX} "$ENV{DepsPath${_ARCH_SUFFIX}}")
   elseif(DEFINED ENV{DepsPath})
     set(DepsPath "$ENV{DepsPath}")
-  endif()
-
-  if(DEFINED ENV{OBS_QTDIR${_ARCH_SUFFIX}})
-    set(QTDIR${_ARCH_SUFFIX} "$ENV{OBS_QTDIR${_ARCH_SUFFIX}}")
-  elseif(DEFINED ENV{OBS_QTDIR})
-    set(QTDIR "$ENV{OBS_QTDIR}")
-  elseif(DEFINED ENV{QTDIR${_ARCH_SUFFIX}})
-    set(QTDIR${_ARCH_SUFFIX} "$ENV{QTDIR${_ARCH_SUFFIX}}")
-  elseif(DEFINED ENV{QTDIR})
-    set(QTDIR "$ENV{QTDIR}")
   endif()
 
   if(DEFINED DepsPath${_ARCH_SUFFIX})
@@ -104,48 +74,6 @@ macro(setup_obs_project)
     )
   endif()
 
-  if(DEFINED QTDIR${_ARCH_SUFFIX})
-    list(APPEND CMAKE_PREFIX_PATH "${QTDIR${_ARCH_SUFFIX}}")
-  elseif(DEFINED QTDIR)
-    list(APPEND CMAKE_PREFIX_PATH "${QTDIR}")
-  endif()
-
-  if(DEFINED ENV{VLCPath})
-    set(VLCPath "$ENV{VLCPath}")
-  elseif(DEFINED ENV{OBS_VLCPath})
-    set(VLCPath "$ENV{OBS_VLCPath}")
-  endif()
-
-  if(DEFINED VLCPath)
-    set(VLC_PATH "${VLCPath}")
-  endif()
-
-  if(DEFINED ENV{CEF_ROOT_DIR})
-    set(CEF_ROOT_DIR "$ENV{CEF_ROOT_DIR}")
-  elseif(DEFINED ENV{OBS_CEF_ROOT_DIR})
-    set(CEF_ROOT_DIR "$ENV{OBS_CEF_ROOT_DIR}")
-  endif()
-
-  if(DEFINED ENV{OBS_InstallerTempDir})
-    file(TO_CMAKE_PATH "$ENV{OBS_InstallerTempDir}" _INSTALLER_TEMP_DIR)
-  elseif(DEFINED ENV{obsInstallerTempDir})
-    file(TO_CMAKE_PATH "$ENV{obsInstallerTempDir}" _INSTALLER_TEMP_DIR)
-  endif()
-
-  set(ENV{OBS_InstallerTempDir} "${_INSTALLER_TEMP_DIR}")
-  unset(_INSTALLER_TEMP_DIR)
-
-  if(DEFINED ENV{OBS_AdditionalInstallFiles})
-    file(TO_CMAKE_PATH "$ENV{OBS_AdditionalInstallFiles}" _ADDITIONAL_FILES)
-  elseif(DEFINED ENV{obsAdditionalInstallFiles})
-    file(TO_CMAKE_PATH "$ENV{obsAdditionalInstallFiles}" _ADDITIONAL_FILES)
-  else()
-    set(_ADDITIONAL_FILES "${CMAKE_SOURCE_DIR}/additional_install_files")
-  endif()
-
-  set(ENV{OBS_AdditionalInstallFiles} "${_ADDITIONAL_FILES}")
-  unset(_ADDITIONAL_FILES)
-
   list(APPEND CMAKE_INCLUDE_PATH
        "$ENV{OBS_AdditionalInstallFiles}/include${_ARCH_SUFFIX}"
        "$ENV{OBS_AdditionalInstallFiles}/include")
@@ -159,8 +87,4 @@ macro(setup_obs_project)
     "$ENV{OBS_AdditionalInstallFiles}/libs"
     "$ENV{OBS_AdditionalInstallFiles}/bin${_ARCH_SUFFIX}"
     "$ENV{OBS_AdditionalInstallFiles}/bin")
-
-  if(BUILD_FOR_DISTRIBUTION OR DEFINED ENV{CI})
-    set_option(ENABLE_RTMPS ON)
-  endif()
 endmacro()

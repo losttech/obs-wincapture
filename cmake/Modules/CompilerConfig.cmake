@@ -7,14 +7,6 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Set compile options for MSVC
 if(OS_WINDOWS AND MSVC)
-  if(NOT EXISTS "${CMAKE_BINARY_DIR}/ALL_BUILD.vcxproj.user")
-    file(
-      GENERATE
-      OUTPUT "${CMAKE_BINARY_DIR}/ALL_BUILD.vcxproj.user"
-      INPUT "${CMAKE_SOURCE_DIR}/cmake/bundle/windows/ALL_BUILD.vcxproj.user.in"
-    )
-  endif()
-
   # CMake 3.24 introduces a bug mistakenly interpreting MSVC as supporting
   # `-pthread`
   if(${CMAKE_VERSION} VERSION_EQUAL "3.24.0")
