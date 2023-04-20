@@ -103,6 +103,7 @@ extern ipc_pipe_client_t pipe;
 extern HANDLE signal_restart;
 extern HANDLE signal_stop;
 extern HANDLE signal_ready;
+extern HANDLE signal_frame;
 extern HANDLE tex_mutexes[2];
 extern char system_path[MAX_PATH];
 extern char process_name[MAX_PATH];
@@ -161,6 +162,14 @@ static inline bool capture_alive(void)
 static inline bool capture_active(void)
 {
 	return active;
+}
+
+static inline void signal_frame_ready()
+{
+	if (!SetEvent(signal_frame)) {
+		hlog("signal_frame_ready: Failed to signal new frame: %d",
+		     GetLastError());
+	}
 }
 
 /** Called to throttle frames to the desired framerate
