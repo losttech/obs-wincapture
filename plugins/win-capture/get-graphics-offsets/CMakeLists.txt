@@ -9,6 +9,8 @@ target_sources(
           dxgi-offsets.cpp
           d3d8-offsets.cpp
           d3d9-offsets.cpp
+          ../nt-stuff.c
+          ../nt-stuff.h
           ../graphics-hook-info.h
           ../hook-helpers.h)
 

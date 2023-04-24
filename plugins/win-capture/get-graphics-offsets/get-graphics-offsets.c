@@ -1,11 +1,20 @@
 #include <inttypes.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <windows.h>
 #include "get-graphics-offsets.h"
 
 struct hook_info *open_hook_info_shmem(const char *shmemName)
 {
-	HANDLE shmem = OpenFileMappingA(FILE_MAP_WRITE, false, shmemName);
+	HANDLE shmem;
+	if (shmemName[0] == '\\') {
+		wchar_t wideName[MAX_PATH + 1];
+		mbstowcs(wideName, shmemName, MAX_PATH);
+		shmem = nt_open_map(wideName);
+	} else {
+		shmem = OpenFileMappingA(FILE_MAP_WRITE, false, shmemName);
+	}
+
 	if (!shmem) {
 		return NULL;
 	}

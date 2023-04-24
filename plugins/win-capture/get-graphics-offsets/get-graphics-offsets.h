@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "../graphics-hook-info.h"
+#include "../nt-stuff.h"
 
 #define DUMMY_WNDCLASS "get_addrs_wndclass"
 
